@@ -2,7 +2,7 @@ import './style.css';
 import { useState, SyntheticEvent } from 'react';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
-import { UserErrors } from '../../errors';
+import { UserErrors } from '../../models/errors';
 import { useNavigate } from 'react-router-dom';
 
 const linkRegister = 'http://localhost:4000/user/register';
@@ -81,7 +81,7 @@ const Login = () => {
       navigate('/');
     } catch (error) {
       let errorMessage: string = '';
-      switch (error.response.data.type) {
+      switch (error?.response?.data?.type) {
         case UserErrors.NO_USER_FOUND:
           errorMessage = 'User does not exist';
           break;
