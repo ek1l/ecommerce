@@ -14,6 +14,7 @@ export const Navbar = () => {
     return (count += getItemCount(product._id));
   });
 
+  const { availableMoney } = useContext(ShopContext);
   return (
     <div className="navbar">
       <div className="navbar-title">
@@ -28,6 +29,7 @@ export const Navbar = () => {
           <FontAwesomeIcon icon={faShoppingCart} />
           {count > 0 && <>{count}</>}
         </Link>
+        <span>${availableMoney.toFixed(2)}</span>
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createContext } from 'react';
 import { useGetProducts } from '../hooks/useGetProducts';
 import { IProduct } from '../models/interfaces';
@@ -14,6 +16,8 @@ export interface IShopContext {
   getItemCount: (itemId: string) => number;
   getTotalCartAmount: () => number;
   checkout: () => void;
+  availableMoney: number;
+  purchasedItems: IProduct[];
 }
 
 const defaultVal: IShopContext = {
@@ -23,14 +27,49 @@ const defaultVal: IShopContext = {
   getItemCount: () => 0,
   getTotalCartAmount: () => 0,
   checkout: () => null,
+  availableMoney: 0,
+  purchasedItems: [],
 };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
 
 export const ShopContextProvider = ({ children }) => {
+  const [cookies, _] = useCookies(['acess_token']);
   const [cartItems, setCartItems] = useState<{ string: number } | {}>({});
+  const [availableMoney, setAvailableMoney] = useState<number>(0);
+  const [purchasedItems, setPurchasedItems] = useState<IProduct[]>([]);
   const navigate = useNavigate();
   const { products } = useGetProducts();
+
+  const fetchAvailableMoney = async () => {
+    const link = `http://localhost:4000/user/available-money/${localStorage.getItem(
+      'userID',
+    )} `;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const res = await axios.get(link, {
+        headers: { Authorization: cookies.acess_token },
+      });
+      setAvailableMoney(res.data.availableMoney);
+    } catch (error) {
+      alert('ERROR: Something went wrong.');
+    }
+  };
+
+  const fetchPurchasedItems = async () => {
+    const link = `http://localhost:4000/product/purchased-items/${localStorage.getItem(
+      'userID',
+    )} `;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const res = await axios.get(link, {
+        headers: { Authorization: cookies.acess_token },
+      });
+      setPurchasedItems(res.data.purchasedItems);
+    } catch (error) {
+      alert('ERROR: Something went wrong.');
+    }
+  };
 
   const getItemCount = (itemId: string): number => {
     if (itemId in cartItems) {
@@ -71,7 +110,7 @@ export const ShopContextProvider = ({ children }) => {
     }
     return totalAmount;
   };
-  const [cookies, _] = useCookies(['acess_token']);
+
   const checkout = async () => {
     const body = { customerID: localStorage.getItem('userID'), cartItems };
     const link = 'http://localhost:4000/product/checkout';
@@ -83,11 +122,22 @@ export const ShopContextProvider = ({ children }) => {
           Authorization: cookies.acess_token,
         },
       });
+      setCartItems({});
+      fetchAvailableMoney();
+      fetchPurchasedItems();
       navigate('/');
     } catch (error) {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchAvailableMoney();
+  }, []);
+
+  useEffect(() => {
+    fetchPurchasedItems();
+  }, []);
 
   let contextValue: IShopContext = {
     addToCart,
@@ -96,6 +146,8 @@ export const ShopContextProvider = ({ children }) => {
     getItemCount,
     getTotalCartAmount,
     checkout,
+    availableMoney,
+    purchasedItems,
   };
   return (
     <ShopContext.Provider value={contextValue}>{children}</ShopContext.Provider>
