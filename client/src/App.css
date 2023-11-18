@@ -25,6 +25,10 @@ body {
   margin-right: 20px;
 }
 
+.navbarLinks a svg {
+  margin-right: 10px;
+}
+
 .navbarLinks span {
   margin: 0px;
   padding: 0px;

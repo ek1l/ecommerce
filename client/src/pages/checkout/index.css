@@ -1,3 +1,11 @@
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
 .cart {
   display: flex;
   flex-direction: column;
@@ -30,6 +38,19 @@
   width: 40px;
   text-align: center;
   font-weight: bolder;
+  outline: none;
+  border: none;
+}
+
+.countHandler button {
+  height: 20px;
+  width: 40px;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.4s;
+  background: rgb(219, 219, 219);
 }
 
 .checkout button {
