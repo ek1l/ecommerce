@@ -9,9 +9,9 @@ interface Props {
 
 export const CartItem = (props: Props) => {
   const { _id, imageURL, productName, price } = props.product;
-  const { addToCart, removeFromCart, updateCartItemCount, getItemCount } =
+  const { addToCart, removeFromCart, updateCartItemCount, getCartItemCount } =
     useContext<IShopContext>(ShopContext);
-  const cartItemCount = getItemCount(_id);
+  const cartItemCount = getCartItemCount(_id);
   return (
     <div className="cart">
       <div className="cartItem">

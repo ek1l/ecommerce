@@ -13,31 +13,38 @@ export interface IShopContext {
   addToCart: (itemId: string) => void;
   removeFromCart: (itemId: string) => void;
   updateCartItemCount: (newAmount: number, itemId: string) => void;
-  getItemCount: (itemId: string) => number;
+  getCartItemCount: (itemId: string) => number;
   getTotalCartAmount: () => number;
-  checkout: () => void;
+  checkout: (customerID: string) => void;
   availableMoney: number;
   purchasedItems: IProduct[];
+  isAuthenticated: boolean;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
 const defaultVal: IShopContext = {
   addToCart: () => null,
   removeFromCart: () => null,
   updateCartItemCount: () => null,
-  getItemCount: () => 0,
+  getCartItemCount: () => 0,
   getTotalCartAmount: () => 0,
   checkout: () => null,
   availableMoney: 0,
   purchasedItems: [],
+  isAuthenticated: false,
+  setIsAuthenticated: () => null,
 };
 
 export const ShopContext = createContext<IShopContext>(defaultVal);
 
 export const ShopContextProvider = ({ children }) => {
-  const [cookies, _] = useCookies(['acess_token']);
+  const [cookies, setCookies] = useCookies(['acess_token']);
   const [cartItems, setCartItems] = useState<{ string: number } | {}>({});
   const [availableMoney, setAvailableMoney] = useState<number>(0);
   const [purchasedItems, setPurchasedItems] = useState<IProduct[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
+    cookies.acess_token !== null,
+  );
   const navigate = useNavigate();
   const { products } = useGetProducts();
 
@@ -71,7 +78,7 @@ export const ShopContextProvider = ({ children }) => {
     }
   };
 
-  const getItemCount = (itemId: string): number => {
+  const getCartItemCount = (itemId: string): number => {
     if (itemId in cartItems) {
       return cartItems[itemId];
     }
@@ -97,18 +104,20 @@ export const ShopContextProvider = ({ children }) => {
     setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
   };
 
-  const getTotalCartAmount = (): number => {
+  const getTotalCartAmount = () => {
+    if (products.length === 0) return 0;
+
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         let itemInfo: IProduct = products.find(
-          (product) => product._id === item,
+          (product) => product._id === item
         );
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
         totalAmount += cartItems[item] * itemInfo.price;
       }
     }
-    return totalAmount;
+    return Number(totalAmount.toFixed(2));
   };
 
   const checkout = async () => {
@@ -132,22 +141,30 @@ export const ShopContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchAvailableMoney();
-  }, []);
+    if (isAuthenticated) {
+      fetchAvailableMoney();
+      fetchPurchasedItems();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    fetchPurchasedItems();
-  }, []);
+    if (!isAuthenticated) {
+      localStorage.clear();
+      setCookies('acess_token', null);
+    }
+  }, [isAuthenticated, setCookies]);
 
   let contextValue: IShopContext = {
     addToCart,
     removeFromCart,
     updateCartItemCount,
-    getItemCount,
+    getCartItemCount,
     getTotalCartAmount,
     checkout,
     availableMoney,
     purchasedItems,
+    isAuthenticated,
+    setIsAuthenticated,
   };
   return (
     <ShopContext.Provider value={contextValue}>{children}</ShopContext.Provider>

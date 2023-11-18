@@ -8,9 +8,9 @@ export const Product = (props: Props) => {
   const { _id, productName, description, price, stockQuantity, imageURL } =
     props.product;
 
-  const { addToCart, getItemCount } = useContext<IShopContext>(ShopContext);
+  const { addToCart, getCartItemCount } = useContext<IShopContext>(ShopContext);
 
-  const count = getItemCount(_id);
+  const count = getCartItemCount(_id);
   return (
     <div className="product" key={_id}>
       <img src={imageURL} alt={productName} />

@@ -3,14 +3,14 @@ import './index.css';
 import { IShopContext, ShopContext } from '../../context/shop-context';
 
 export const PurchasedItemsPage = () => {
-  const { purchasedItems, addToCart, getItemCount } =
+  const { purchasedItems, addToCart, getCartItemCount } =
     useContext<IShopContext>(ShopContext);
   return (
     <div className="purchased-items-page">
       <h1>Previously Purchased Items</h1>
       <div className="purchased-items">
         {purchasedItems.map((item, index) => {
-          const count = getItemCount(item._id);
+          const count = getCartItemCount(item._id);
           return (
             <div key={index} className="item">
               <h3>{item.productName}</h3>
