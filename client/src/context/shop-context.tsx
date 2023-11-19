@@ -105,19 +105,18 @@ export const ShopContextProvider = ({ children }) => {
   };
 
   const getTotalCartAmount = () => {
-    if (products.length === 0) return 0;
-
+    if (products.length === 0) return;
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         let itemInfo: IProduct = products.find(
-          (product) => product._id === item
+          (product) => product._id === item,
         );
 
         totalAmount += cartItems[item] * itemInfo.price;
       }
     }
-    return Number(totalAmount.toFixed(2));
+    return totalAmount;
   };
 
   const checkout = async () => {

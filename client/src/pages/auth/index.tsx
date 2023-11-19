@@ -3,16 +3,23 @@ import { useState, SyntheticEvent, useContext } from 'react';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 import { errors } from '../../models/errors';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { IShopContext, ShopContext } from '../../context/shop-context';
 
 const linkRegister = 'http://localhost:4000/user/register';
 const linkLogin = 'http://localhost:4000/user/login';
 
 export const AuthPage = () => {
+  const { isAuthenticated } = useContext(ShopContext);
   return (
     <div className="auth">
-      <Register /> <Login />
+      {!isAuthenticated ? (
+        <>
+          <Register /> <Login />
+        </>
+      ) : (
+        <Navigate to="/" />
+      )}
     </div>
   );
 };
@@ -44,7 +51,7 @@ const Register = () => {
           <label htmlFor="username">Username:</label>
           <input
             type="text"
-            id="username"
+            className="username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
           />
@@ -53,7 +60,7 @@ const Register = () => {
           <label htmlFor="password">password:</label>
           <input
             type="password"
-            id="password"
+            className="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
           />
@@ -105,7 +112,7 @@ const Login = () => {
           <label htmlFor="username">Username:</label>
           <input
             type="text"
-            id="username"
+            className="username"
             onChange={(e) => setUsername(e.target.value)}
             value={username}
           />
@@ -114,7 +121,7 @@ const Login = () => {
           <label htmlFor="password">password:</label>
           <input
             type="password"
-            id="password"
+            className="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
           />

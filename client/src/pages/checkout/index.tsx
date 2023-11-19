@@ -15,18 +15,19 @@ export const CheckoutPage = () => {
   const { products } = useGetProducts();
 
   const navigate = useNavigate();
-
+  console.log(totalAmount);
   return (
     <div className="cart">
       <div>
         <h1>Your Cart Items</h1>
       </div>
       <div className="cart">
-        {products.map((product: IProduct) => {
-          if (getCartItemCount(product._id) !== 0) {
-            return <CartItem product={product} />;
-          }
-        })}
+        {products &&
+          products.map((product: IProduct, index) => {
+            if (getCartItemCount(product._id) !== 0) {
+              return <CartItem key={index} product={product} />;
+            }
+          })}
       </div>
 
       {totalAmount > 0 ? (
@@ -35,9 +36,11 @@ export const CheckoutPage = () => {
           <button onClick={() => navigate('/')}> Continue Shopping </button>
           <button
             onClick={() => {
-              checkout(localStorage.getItem('userID'));
+              const customerID = localStorage.getItem('userID');
+              checkout(customerID);
             }}
           >
+            Checkout
           </button>
         </div>
       ) : (
